@@ -1,0 +1,2 @@
+Hello, This is file writer exampleABufferedWriter
+ BufferedWriter example

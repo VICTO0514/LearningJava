@@ -1,0 +1,116 @@
+1️⃣ What is the difference between Array, ArrayList, and LinkedList?
+Feature	Array	ArrayList	LinkedList
+Size	Fixed (static)	Dynamic (resizable)	Dynamic (resizable)
+Access Time	O(1) (direct access)	O(1) (direct access by index)	O(n) (sequential access)
+Insertion/Deletion	Expensive (need manual handling)	Faster than Array for add/remove at end, slow in middle	Fast insertion/removal anywhere (O(1) if node known)
+Internal Structure	Contiguous memory	Dynamic array	Doubly linked nodes
+2️⃣ What are the key interfaces in the Java Collections Framework?
+
+Collection: Root interface for groups of objects. Has methods like add(), remove(), size().
+
+Subinterfaces:
+
+List: Ordered collection, allows duplicates (e.g., ArrayList, LinkedList)
+
+Set: No duplicates allowed (e.g., HashSet, TreeSet)
+
+Queue: For holding elements prior to processing (e.g., PriorityQueue)
+
+Map: Not a Collection, but stores key-value pairs (e.g., HashMap, TreeMap)
+
+3️⃣ When will you choose HashMap over TreeMap?
+Feature	HashMap	TreeMap
+Order	No order (unsorted)	Sorted order (natural or comparator)
+Performance	Faster (O(1) avg for get/put)	Slower (O(log n) for get/put)
+Null keys	Allows one null key	Does NOT allow null keys
+
+Choose HashMap if speed is important and sorting is not needed.
+
+4️⃣ What is the difference between HashSet and TreeSet?
+Feature	HashSet	TreeSet
+Order	No guaranteed order	Sorted order (natural/comparator)
+Performance	Faster (O(1) add/remove)	Slower (O(log n) add/remove)
+Null elements	Allows one null element	Does NOT allow null elements
+Duplicates	Not allowed	Not allowed
+5️⃣ Can you store null in HashSet, HashMap, TreeSet, and TreeMap?
+Collection	Allows Null?	Notes
+HashSet	Yes, one null allowed	Only one null allowed
+HashMap	Yes, one null key allowed	Also allows multiple null values
+TreeSet	No	Throws NullPointerException
+TreeMap	No	Throws NullPointerException
+6️⃣ What is the difference between List, Set, and Map?
+Interface	Allows duplicates?	Stores key-value pairs?	Maintains insertion order?
+List	Yes	No	Yes (ArrayList, LinkedList)
+Set	No	No	Depends (e.g., LinkedHashSet yes)
+Map	Keys no, values yes	Yes	Depends (LinkedHashMap yes)
+7️⃣ What is the internal structure of a HashMap?
+
+Uses an array of buckets, where each bucket is a linked list or balanced tree (for many collisions).
+
+Hashing: The key’s hashCode() is used to find the bucket index.
+
+Collision: When two keys have the same hash, they are stored in the same bucket — resolved by chaining (linked list or tree).
+
+Since Java 8, if bucket size exceeds threshold, linked list converts to balanced tree (Red-Black tree) for better performance.
+
+8️⃣ What’s the difference between equals() and hashCode()? Why are they important in collections?
+
+equals() checks logical equality of objects.
+
+hashCode() returns an integer hash, used for placing objects in hash-based collections (HashMap, HashSet).
+
+Contract: If two objects are equal (equals() returns true), their hashCode() must be the same.
+
+If not, collections like HashMap will malfunction (e.g., fail to find keys).
+
+9️⃣ You want to store unique student names in the order they were added. Which collection will you use?
+
+Answer: LinkedHashSet
+
+Maintains insertion order
+
+No duplicates allowed
+
+🔟 You are implementing a leaderboard system, where you want to:
+
+Store player names and scores
+
+Sort players by their score automatically
+
+Answer: Use a TreeMap with scores as keys, or PriorityQueue with custom comparator
+
+TreeMap<Integer, String> — keys sorted by score
+
+Or PriorityQueue to keep top scores efficiently
+
+1️⃣1️⃣ What is ConcurrentHashMap? How is it different from HashMap?
+
+ConcurrentHashMap is a thread-safe version of HashMap.
+
+Allows concurrent read and write by multiple threads without locks on the entire map.
+
+Internally uses segment locks or finer-grained locking.
+
+HashMap is not thread-safe — concurrent modification may cause data corruption.
+
+1️⃣2️⃣ Can a HashMap have duplicate keys? What happens when you put the same key twice?
+
+No duplicate keys allowed.
+
+If you put a key that already exists, the old value is replaced with the new value.
+
+Example:
+
+map.put("A", 1);
+map.put("A", 2); // replaces 1 with 2
+
+1️⃣3️⃣ What's the difference between ArrayList and Vector?
+Feature	ArrayList	Vector
+Thread-safe?	No	Yes (synchronized)
+Performance	Faster (non-synchronized)	Slower (due to synchronization)
+Legacy?	Part of Java Collections Framework	Legacy class, old API
+1️⃣4️⃣ What is the time complexity of get() in:
+Collection	get() Time Complexity
+ArrayList	O(1) (direct access by index)
+LinkedList	O(n) (sequential traversal)
+HashMap	O(1) avg (hash + bucket)

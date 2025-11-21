@@ -1,0 +1,87 @@
+File Basics
+
+What is a file?
+
+File vs Directory (Folder)
+
+File path (absolute vs relative)
+
+Java File I/O Classes
+
+File class (for file/directory info and manipulation)
+
+FileReader / FileWriter (character streams)
+
+BufferedReader / BufferedWriter (buffered character streams)
+
+FileInputStream / FileOutputStream (byte streams)
+
+BufferedInputStream / BufferedOutputStream
+
+PrintWriter (for formatted output)
+
+Scanner (reading text input)
+
+Reading Files
+
+Reading characters, lines, or bytes
+
+Reading text files vs binary files
+
+Handling EOF (end of file)
+
+Writing Files
+
+Writing characters, strings, bytes
+
+Appending vs overwriting
+
+Flushing and closing streams
+
+File and Directory Operations
+
+Creating files/directories
+
+Deleting files/directories
+
+Checking file existence, size, permissions
+
+Listing directory contents
+
+Buffering and Performance
+
+Why use buffered streams?
+
+Difference between buffered and unbuffered streams
+
+Buffer sizes
+
+File Paths and File Separators
+
+Platform-dependent paths
+
+Using File.separator or Paths class
+
+Exception Handling in File I/O
+
+Handling IOException
+
+Using try-catch or try-with-resources
+
+File Permissions and Security
+
+Read/write/execute permissions
+
+Access control
+
+Advanced Topics
+
+Random access files (RandomAccessFile)
+
+File channels and NIO (New I/O)
+
+Memory-mapped files
+
+Serialization (writing objects to files)
+
+File watchers (monitoring changes)

@@ -1,0 +1,32 @@
+package java.util;
+
+public class LinkedHashSet<E> extends HashSet<E> {
+    // constructors
+    public LinkedHashSet(int initialCapacity, float loadFactor) {
+        super(initialCapacity, loadFactor, /* dummy = */ true);
+    }
+
+    public LinkedHashSet(int initialCapacity) {
+        super(initialCapacity, .75f, true);
+    }
+
+    public LinkedHashSet() {
+        super(16, .75f, true);
+    }
+
+    public LinkedHashSet(Collection<? extends E> c) {
+        super(Math.max(2*c.size(), 11), .75f, true);
+        addAll(c);
+    }
+
+    // no other major overrides; inherits add, remove, contains etc from HashSet
+}
+
+
+Notice the super(..., true) calls. That boolean true is a dummy flag used in HashSet’s protected constructor that picks a LinkedHashMap instead of a plain HashMap.
+
+LinkedHashSet itself doesn’t override add, remove, etc — it relies on HashSet logic (which uses the backing map) to perform operations.
+
+The constructor LinkedHashSet(Collection<? extends E> c) creates an underlying map capacity large enough, then addAll(c) to preserve insertion order of the input collection.
+
+இதுதான் LinkedHashSet class-level source. Other logic (iteration, linking) comes from HashSet + LinkedHashMap.

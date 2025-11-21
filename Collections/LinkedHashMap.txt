@@ -1,0 +1,109 @@
+// In class LinkedHashMap<K,V> extends HashMap<K,V>
+
+static class Entry<K,V> extends HashMap.Node<K,V> {
+    Entry<K,V> before, after;
+    Entry(int hash, K key, V value, Node<K,V> next) {
+        super(hash, key, value, next);
+    }
+}
+
+// after inserting a node, hook:
+void afterNodeInsertion(boolean evict) {
+    LinkedHashMap.Entry<K,V> first;
+    if (evict && (first = head) != null && removeEldestEntry(first)) {
+        K key = first.key;
+        removeNode(hash(key), key, null, false, true);
+    }
+}
+
+// after removal
+void afterNodeRemoval(Node<K,V> e) {
+    LinkedHashMap.Entry<K,V> p = (LinkedHashMap.Entry<K,V>) e;
+    LinkedHashMap.Entry<K,V> b = p.before, a = p.after;
+    p.before = p.after = null;
+    if (b == null) {
+        head = a;
+    } else {
+        b.after = a;
+    }
+    if (a == null) {
+        tail = b;
+    } else {
+        a.before = b;
+    }
+}
+
+// when a node is accessed (if accessOrder = true), move it to end
+void afterNodeAccess(Node<K,V> e) {
+    if (accessOrder) {
+        LinkedHashMap.Entry<K,V> p = (LinkedHashMap.Entry<K,V>) e;
+        LinkedHashMap.Entry<K,V> b = p.before, a = p.after;
+        // unlink p
+        if (b == null) {
+            head = a;
+        } else {
+            b.after = a;
+        }
+        if (a != null) {
+            a.before = b;
+        } else {
+            // no next means p was tail
+        }
+        // append p at tail
+        p.before = tail;
+        p.after = null;
+        if (tail != null) {
+            tail.after = p;
+        }
+        tail = p;
+        modCount++;
+    }
+}
+
+// For serialization: write entries in order
+void internalWriteEntries(java.io.ObjectOutputStream s) throws IOException {
+    for (LinkedHashMap.Entry<K,V> e = head; e != null; e = e.after) {
+        s.writeObject(e.key);
+        s.writeObject(e.value);
+    }
+}
+
+// Transfer during resize / rehash
+void transfer(HashMap.Node<K,V>[] newTable) {
+    int newCapacity = newTable.length;
+    for (Entry<K,V> e = head; e != null; e = e.after) {
+        int idx = e.hash & (newCapacity - 1);
+        e.next = newTable[idx];
+        newTable[idx] = e;
+    }
+}
+
+
+
+Entry is the inner static class which extends the basic HashMap.Node (which has hash, key, value, next pointers). Entry adds before, after.
+
+afterNodeInsertion, afterNodeRemoval, afterNodeAccess are callback hooks in LinkedHashMap that maintain the doubly-linked list pointers whenever nodes are inserted, removed, or accessed (in access-order mode).
+
+transfer(...) is called during resizing / rehash. It reinserts nodes into new buckets in the same linked-order traversal (for (e = head; e != null; e = e.after)). That ensures the insertion-order linked list is not broken; only the bucket next pointers are updated.
+
+internalWriteEntries(...) is used in Java serialization to write out the entries in insertion order, so that deserialization can reconstruct the same order.
+
+Thus we see the concrete internal mechanics.
+
+Using those code snippets, let me walk through the lifecycle of adding / removing / iterating:
+
+When new LinkedHashSet<>() is created, via its constructor, it calls super(initialCapacity, loadFactor, true) in HashSet, which instantiates the backing map = new LinkedHashMap<>(...).
+
+When you call linkedHashSet.add(e), HashSet’s add method calls map.put(e, PRESENT) (where PRESENT is a dummy static object). Because map is a LinkedHashMap, put uses HashMap logic + afterNodeInsertion(...) hook to maintain linked order.
+
+On remove(e), HashSet.remove will delegate to map.remove(e), causing the LinkedHashMap logic to remove the node from hash buckets and also call afterNodeRemoval(...) to unlink from doubly-linked list.
+
+On iteration (via iterator() on LinkedHashSet), internally the iterator uses the map.keySet().iterator(), where keySet() returns a view over the keys of the map in insertion order — the iterator starts from head and traverses via .after pointers.
+
+When resizing (rehash) is needed, LinkedHashMap.transfer(...) is invoked: it loops over entries in linked-list order and reassigns bucket pointers; but the linked-list before/after chain is untouched.
+
+On serialization, the internalWriteEntries(...) will write all keys & values in insertion order. On deserialization, the map is rebuilt in that order (so order preserved).
+
+If accessOrder = true was used (not typical for LinkedHashSet, but possible for LinkedHashMap), then afterNodeAccess(...) moves accessed nodes to the tail (making the map “least recently used” order) on get, put, etc. But default is insertion order mode (accessOrder = false).
+
+Thus the source code matches our earlier high-level explanation.
